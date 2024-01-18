@@ -1,0 +1,21 @@
+version: "1"
+
+services:
+  db:
+    container_name: postgres # never do this in a production environment!
+    image: postgres:latest
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: productsdb
+      PGDATA: /var/lib/postgresql/pgdata
+    ports:
+      - 5434:5432
+    volumes:
+      - pgdata:/var/lib/postgresql
+    restart: always
+
+volumes:
+  pgdata:
+    external: true
+    name: postgres_data
