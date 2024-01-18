@@ -29,7 +29,7 @@ const (
 	password = "postgres"
 )
 
-func CreateConnection() *sql.DB {
+func createConnection() *sql.DB {
 	err := godotenv.Load(".env")
 	if err != nil {
 		log.Fatal("Erro loading .env file")
@@ -145,4 +145,36 @@ func DeleteProduct(w http.ResponseWriter, r *http.Request) {
 	}
 
 	json.NewEncoder(w).Encode(res)
+}
+
+func insertProduct(product models.Product) int64 {
+	db := createConnection()
+	defer db.Close()
+	sqlStatement := `INSERT INTO products(name, price, company) VALUES ($1, $2, $3) RETURNING productid`
+	var id int64
+
+	err := db.QueryRow(sqlStatement, product.Name, product.Price, product.Company).Scan(&id)
+
+	if err != nil {
+		log.Fatal("unable to execute the query. %v", err)
+	}
+
+	fmt.Printf("Inseted a single record %v", id)
+	return id
+}
+
+func getProduct(id int64) (models.Product, error) {
+
+}
+
+func getAllProducts() ([]models.Product, error) {
+
+}
+
+func updateProduct(id int64, product models.Product) int64 {
+
+}
+
+func deleteProduct(id int64) int64 {
+
 }
