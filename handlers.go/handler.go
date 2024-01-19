@@ -94,7 +94,7 @@ func GetProduct(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(product)
 }
 func GetAllProducts(w http.ResponseWriter, r *http.Request) {
-	products, err := GetAllProducts()
+	products, err := getAllProducts()
 	if err != nil {
 		log.Fatalf("unable to get all the products %v", err)
 	}
@@ -130,7 +130,7 @@ func UpdateProduct(w http.ResponseWriter, r *http.Request) {
 }
 func DeleteProduct(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
-	id, err := strconv.ParseInt(params["id"])
+	id, err := strconv.Atoi(params["id"])
 	if err != nil {
 		log.Fatalf("unable to convert string to int. %v", err)
 	}
@@ -164,11 +164,55 @@ func insertProduct(product models.Product) int64 {
 }
 
 func getProduct(id int64) (models.Product, error) {
+	db := createConnection()
+	defer db.Close()
 
+	var product models.Product
+
+	sqlStatement := `SELECT * FROM products WHERE productid=$1`
+
+	row := db.QueryRow(sqlStatement, id)
+
+	err := row.Scan(&product.ProductID, &product.Name, &product.Price, &product.Company)
+
+	switch err {
+	case sql.ErrNoRows:
+		fmt.Println("No rows were returned!")
+		return product, nil
+	case nil:
+		return product, nil
+	default:
+		log.Fatalf("unable to scan the ro. %v", err)
+	}
+
+	return product, err
 }
 
 func getAllProducts() ([]models.Product, error) {
+	db := createConnection()
+	defer db.Close()
 
+	var products []models.Product
+
+	sqlStatement := `SELECT * FROM products`
+
+	rows, err := db.Query(sqlStatement)
+	if err != nil {
+		log.Fatalf("unable to execute the query. %v, err")
+	}
+
+	defer rows.Close()
+
+	for rows.Next() {
+		var product models.Product
+
+		err = rows.Scan(&product.ProductID, &product.Name, &product.Price, &product.Company)
+		if err != nil {
+			log.Fatalf("ufnable to scan the row %v", err)
+		}
+		products = append(products, product)
+	}
+	return products, err
 }
 
 func updateProduct(id int64, product models.Product) int64 {
