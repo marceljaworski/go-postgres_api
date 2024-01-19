@@ -10,23 +10,20 @@ import (
 	"github.com/joho/godotenv"
 )
 
-// postgress values variables
-const (
-	host   = "localhost"
-	port   = 5434
-	user   = "postgres"
-	dbname = "productsdb"
-)
-
 func createConnection() *sql.DB {
 	err := godotenv.Load(".env")
 	if err != nil {
 		log.Fatal("Erro loading .env file")
 	}
+
+	host := os.Getenv("HOST")
+	port := os.Getenv("PORT")
+	user := os.Getenv("USER")
 	password := os.Getenv("PASSWORD")
+	dbname := os.Getenv("DBNAME")
 
 	// Postgres connection string
-	psqlConnString := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
+	psqlConnString := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable",
 		host,
 		port,
 		user,
