@@ -16,17 +16,16 @@ import (
 )
 
 type response struct {
-	ID      int64  `json:"id,omitempty`
-	Message string `json:"message,omitempty`
+	ID      int64  `json:"id,omitempty"`
+	Message string `json:"message,omitempty"`
 }
 
 // postgress values variables
 const (
-	host     = "localhost"
-	port     = 5434
-	user     = "postgres"
-	dbname   = "productsdb"
-	password = "postgres"
+	host   = "localhost"
+	port   = 5434
+	user   = "postgres"
+	dbname = "productsdb"
 )
 
 func createConnection() *sql.DB {
@@ -65,7 +64,7 @@ func CreateProduct(w http.ResponseWriter, r *http.Request) {
 
 	err := json.NewDecoder(r.Body).Decode(&product)
 	if err != nil {
-		log.Fatal("Unabel to decode the request body. %v", err)
+		log.Fatalf("Unabel to decode the request body. %v", err)
 	}
 
 	insertID := insertProduct(product)
@@ -156,7 +155,7 @@ func insertProduct(product models.Product) int64 {
 	err := db.QueryRow(sqlStatement, product.Name, product.Price, product.Company).Scan(&id)
 
 	if err != nil {
-		log.Fatal("unable to execute the query. %v", err)
+		log.Fatalf("unable to execute the query. %v", err)
 	}
 
 	fmt.Printf("Inseted a single record %v", id)
@@ -198,7 +197,7 @@ func getAllProducts() ([]models.Product, error) {
 
 	rows, err := db.Query(sqlStatement)
 	if err != nil {
-		log.Fatalf("unable to execute the query. %v, err")
+		log.Fatalf("unable to execute the query. %v", err)
 	}
 
 	defer rows.Close()
