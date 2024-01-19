@@ -9,6 +9,8 @@ import (
 	"os"
 	"strconv"
 
+	_ "github.com/lib/pq"
+
 	"go-postgres_api/models"
 
 	"github.com/gorilla/mux"
@@ -64,7 +66,7 @@ func CreateProduct(w http.ResponseWriter, r *http.Request) {
 
 	err := json.NewDecoder(r.Body).Decode(&product)
 	if err != nil {
-		log.Fatalf("Unabel to decode the request body. %v", err)
+		log.Fatalf("Unabel to decode the request body. %v\n", err)
 	}
 
 	insertID := insertProduct(product)
@@ -82,12 +84,12 @@ func GetProduct(w http.ResponseWriter, r *http.Request) {
 
 	id, err := strconv.Atoi(params["id"])
 	if err != nil {
-		log.Fatalf("unable to convert the string into int. %v", err)
+		log.Fatalf("unable to convert the string into int. %v\n", err)
 	}
 
 	product, err := getProduct(int64(id))
 	if err != nil {
-		log.Fatalf("unable to get stock. %v", err)
+		log.Fatalf("unable to get stock. %v\n", err)
 	}
 
 	json.NewEncoder(w).Encode(product)
@@ -95,7 +97,7 @@ func GetProduct(w http.ResponseWriter, r *http.Request) {
 func GetAllProducts(w http.ResponseWriter, r *http.Request) {
 	products, err := getAllProducts()
 	if err != nil {
-		log.Fatalf("unable to get all the products %v", err)
+		log.Fatalf("unable to get all the products %v\n", err)
 	}
 
 	json.NewEncoder(w).Encode(products)
@@ -117,7 +119,7 @@ func UpdateProduct(w http.ResponseWriter, r *http.Request) {
 
 	updatedRows := updateProduct(int64(id), product)
 
-	msg := fmt.Sprintf("Product updated successfully. Total rows/records affected %v", updatedRows)
+	msg := fmt.Sprintf("Product updated successfully. Total rows/records affected %v\n", updatedRows)
 
 	res := response{
 		ID:      int64(id),
@@ -136,7 +138,7 @@ func DeleteProduct(w http.ResponseWriter, r *http.Request) {
 
 	deletedRows := deleteProduct(int64(id))
 
-	msg := fmt.Sprintf("Product deleted suscessfully. Total rows/records %v", deletedRows)
+	msg := fmt.Sprintf("Product deleted suscessfully. Total rows/records %v\n", deletedRows)
 
 	res := response{
 		ID:      int64(id),
@@ -155,10 +157,10 @@ func insertProduct(product models.Product) int64 {
 	err := db.QueryRow(sqlStatement, product.Name, product.Price, product.Company).Scan(&id)
 
 	if err != nil {
-		log.Fatalf("unable to execute the query. %v", err)
+		log.Fatalf("unable to execute the query. %v\n", err)
 	}
 
-	fmt.Printf("Inseted a single record %v", id)
+	fmt.Printf("Inseted a single record, id:%v\n", id)
 	return id
 }
 
@@ -181,7 +183,7 @@ func getProduct(id int64) (models.Product, error) {
 	case nil:
 		return product, nil
 	default:
-		log.Fatalf("unable to scan the ro. %v", err)
+		log.Fatalf("unable to scan the ro. %v\n", err)
 	}
 
 	return product, err
@@ -197,7 +199,7 @@ func getAllProducts() ([]models.Product, error) {
 
 	rows, err := db.Query(sqlStatement)
 	if err != nil {
-		log.Fatalf("unable to execute the query. %v", err)
+		log.Fatalf("unable to execute the query. %v\n", err)
 	}
 
 	defer rows.Close()
@@ -207,7 +209,7 @@ func getAllProducts() ([]models.Product, error) {
 
 		err = rows.Scan(&product.ProductID, &product.Name, &product.Price, &product.Company)
 		if err != nil {
-			log.Fatalf("ufnable to scan the row %v", err)
+			log.Fatalf("ufnable to scan the row %v\n", err)
 		}
 		products = append(products, product)
 	}
@@ -223,15 +225,15 @@ func updateProduct(id int64, product models.Product) int64 {
 	res, err := db.Exec(sqlStatement, id, product.Name, product.Price, product.Company)
 
 	if err != nil {
-		log.Fatalf("unable to execute the query %v", err)
+		log.Fatalf("unable to execute the query %v\n", err)
 	}
 
 	rowsAffected, err := res.RowsAffected()
 	if err != nil {
-		log.Fatalf("error whilw checking the affected rows. %v", err)
+		log.Fatalf("error whilw checking the affected rows. %v\n", err)
 	}
 
-	fmt.Printf("Total rows/records affected %v", rowsAffected)
+	fmt.Printf("Total rows/records affected %v\n", rowsAffected)
 
 	return rowsAffected
 }
@@ -243,15 +245,15 @@ func deleteProduct(id int64) int64 {
 	sqlStatement := `DELETE FROM products WHERE productid=$1`
 	res, err := db.Exec(sqlStatement, id)
 	if err != nil {
-		log.Fatalf("unable to execute the query %v", err)
+		log.Fatalf("unable to execute the query %v\n", err)
 	}
 
 	rowsAffected, err := res.RowsAffected()
 	if err != nil {
-		log.Fatalf("error whilw checking the affected rows. %v", err)
+		log.Fatalf("error whilw checking the affected rows. %v\n", err)
 	}
 
-	fmt.Printf("Total rows/records affected %v", rowsAffected)
+	fmt.Printf("Total rows/records affected %v\n", rowsAffected)
 
 	return rowsAffected
 }
