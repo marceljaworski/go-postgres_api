@@ -216,9 +216,43 @@ func getAllProducts() ([]models.Product, error) {
 }
 
 func updateProduct(id int64, product models.Product) int64 {
+	db := createConnection()
+	defer db.Close()
 
+	sqlStatement := `UPDATE products SET name=$2, price=$3, company=$4 WHERE productid=$1`
+
+	res, err := db.Exec(sqlStatement, id, product.Name, product.Price, product.Company)
+
+	if err != nil {
+		log.Fatalf("unable to execute the query %v", err)
+	}
+
+	rowsAffected, err := res.RowsAffected()
+	if err != nil {
+		log.Fatalf("error whilw checking the affected rows. %v", err)
+	}
+
+	fmt.Printf("Total rows/records affected %v", rowsAffected)
+
+	return rowsAffected
 }
 
 func deleteProduct(id int64) int64 {
+	db := createConnection()
+	defer db.Close()
 
+	sqlStatement := `DELETE FROM products WHERE productid=$1`
+	res, err := db.Exec(sqlStatement, id)
+	if err != nil {
+		log.Fatalf("unable to execute the query %v", err)
+	}
+
+	rowsAffected, err := res.RowsAffected()
+	if err != nil {
+		log.Fatalf("error whilw checking the affected rows. %v", err)
+	}
+
+	fmt.Printf("Total rows/records affected %v", rowsAffected)
+
+	return rowsAffected
 }
