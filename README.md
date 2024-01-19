@@ -2,7 +2,9 @@
 
 ## Features
 
-- Postgres DB
+- PostgresSQL DB
+- Docker compose
+- CRUD API
 
 ## Build Postgres container
 
@@ -24,16 +26,16 @@ list databases
 `\l`
 
 Sign into the database
-`psql orders`
+`psql productsdb`
 
 Ensure you are conected ro database
-`\c orders`
+`\c products`
 
 List of the available tables
 `\d`
 
-Show table orders_db
-`\d orders_db`
+Show table products
+`\d products`
 
 Use CASCADE with DROP TABLE (and DROP SCHEMA)
 
