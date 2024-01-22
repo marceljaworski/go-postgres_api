@@ -1,7 +1,7 @@
 package router
 
 import (
-	"go-postgres_api/handlers"
+	"github.com/marceljaworski/go-postgres_api/handlers"
 
 	"github.com/gorilla/mux"
 )

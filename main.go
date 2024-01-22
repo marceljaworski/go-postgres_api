@@ -2,9 +2,10 @@ package main
 
 import (
 	"fmt"
-	"go-postgres_api/router"
 	"log"
 	"net/http"
+
+	"github.com/marceljaworski/go-postgres_api/router"
 )
 
 func main() {

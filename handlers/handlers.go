@@ -9,9 +9,9 @@ import (
 
 	_ "github.com/lib/pq"
 
-	"go-postgres_api/models"
+	"github.com/marceljaworski/go-postgres_api/models"
 
-	"go-postgres_api/repository"
+	"github.com/marceljaworski/go-postgres_api/repository"
 
 	"github.com/gorilla/mux"
 )

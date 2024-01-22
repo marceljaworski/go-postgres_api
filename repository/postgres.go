@@ -3,9 +3,10 @@ package repository
 import (
 	"database/sql"
 	"fmt"
-	"go-postgres_api/models"
 	"log"
 	"os"
+
+	"github.com/marceljaworski/go-postgres_api/models"
 
 	"github.com/cenkalti/backoff"
 	"github.com/joho/godotenv"
