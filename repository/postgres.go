@@ -7,20 +7,25 @@ import (
 	"log"
 	"os"
 
+	"github.com/cenkalti/backoff"
 	"github.com/joho/godotenv"
 )
 
-func createConnection() *sql.DB {
-	err := godotenv.Load(".env")
+func createConnection() (*sql.DB, error) {
+	var (
+		db  *sql.DB
+		err error
+	)
+	err = godotenv.Load(".env")
 	if err != nil {
 		log.Fatal("Erro loading .env file")
 	}
 
-	host := os.Getenv("HOST")
-	port := os.Getenv("PORT")
-	user := os.Getenv("USER")
-	password := os.Getenv("PASSWORD")
-	dbname := os.Getenv("DBNAME")
+	host := os.Getenv("PG_HOST")
+	port := os.Getenv("PG_PORT")
+	user := os.Getenv("PG_USER")
+	password := os.Getenv("PG_PASSWORD")
+	dbname := os.Getenv("PG_DBNAME")
 
 	// Postgres connection string
 	psqlConnString := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable",
@@ -31,38 +36,44 @@ func createConnection() *sql.DB {
 		dbname,
 	)
 
-	db, err := sql.Open("postgres", psqlConnString)
-	if err != nil {
-		panic(err)
+	openDB := func() error {
+		db, err = sql.Open("postgres", psqlConnString)
+		return err
 	}
 
-	err = db.Ping() // Check connection
+	err = backoff.Retry(openDB, backoff.NewExponentialBackOff())
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
 
 	fmt.Println("Successfully connected to postgres")
 
-	return db
+	return db, nil
 }
 
 func Insert(product models.Product) int64 {
-	db := createConnection()
+	db, err := createConnection()
+	if err != nil {
+		log.Fatalf("unable to connect the database. %v\n", err)
+	}
 	defer db.Close()
 	sqlStatement := `INSERT INTO products(name, price, company) VALUES ($1, $2, $3) RETURNING productid`
 	var id int64
 
-	err := db.QueryRow(sqlStatement, product.Name, product.Price, product.Company).Scan(&id)
+	err = db.QueryRow(sqlStatement, product.Name, product.Price, product.Company).Scan(&id)
 
 	if err != nil {
 		log.Fatalf("unable to execute the query. %v\n", err)
 	}
 
-	fmt.Printf("Inseted a single record, id:%v\n", id)
+	fmt.Printf("Inserted a single record, id: %v\n", id)
 	return id
 }
 func GetOne(id int64) (models.Product, error) {
-	db := createConnection()
+	db, err := createConnection()
+	if err != nil {
+		log.Fatalf("unable to connect the database. %v\n", err)
+	}
 	defer db.Close()
 
 	var product models.Product
@@ -71,7 +82,7 @@ func GetOne(id int64) (models.Product, error) {
 
 	row := db.QueryRow(sqlStatement, id)
 
-	err := row.Scan(&product.ProductID, &product.Name, &product.Price, &product.Company)
+	err = row.Scan(&product.ProductID, &product.Name, &product.Price, &product.Company)
 
 	switch err {
 	case sql.ErrNoRows:
@@ -86,7 +97,10 @@ func GetOne(id int64) (models.Product, error) {
 	return product, err
 }
 func GetAll() ([]models.Product, error) {
-	db := createConnection()
+	db, err := createConnection()
+	if err != nil {
+		log.Fatalf("unable to connect the database. %v\n", err)
+	}
 	defer db.Close()
 
 	var products []models.Product
@@ -105,7 +119,7 @@ func GetAll() ([]models.Product, error) {
 
 		err = rows.Scan(&product.ProductID, &product.Name, &product.Price, &product.Company)
 		if err != nil {
-			log.Fatalf("ufnable to scan the row %v\n", err)
+			log.Fatalf("unable to scan the row %v\n", err)
 		}
 		products = append(products, product)
 	}
@@ -113,7 +127,10 @@ func GetAll() ([]models.Product, error) {
 }
 
 func UpdateProduct(id int64, product models.Product) int64 {
-	db := createConnection()
+	db, err := createConnection()
+	if err != nil {
+		log.Fatalf("unable to connect the database. %v\n", err)
+	}
 	defer db.Close()
 
 	sqlStatement := `UPDATE products SET name=$2, price=$3, company=$4 WHERE productid=$1`
@@ -135,7 +152,10 @@ func UpdateProduct(id int64, product models.Product) int64 {
 }
 
 func DeleteProduct(id int64) int64 {
-	db := createConnection()
+	db, err := createConnection()
+	if err != nil {
+		log.Fatalf("unable to connect the database. %v\n", err)
+	}
 	defer db.Close()
 
 	sqlStatement := `DELETE FROM products WHERE productid=$1`
