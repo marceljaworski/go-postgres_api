@@ -4,56 +4,13 @@ import (
 	"database/sql"
 	"fmt"
 	"log"
-	"os"
 
+	"github.com/marceljaworski/go-postgres_api/lib"
 	"github.com/marceljaworski/go-postgres_api/models"
-
-	"github.com/cenkalti/backoff"
-	"github.com/joho/godotenv"
 )
 
-func createConnection() (*sql.DB, error) {
-	var (
-		db  *sql.DB
-		err error
-	)
-	err = godotenv.Load(".env")
-	if err != nil {
-		log.Fatal("Erro loading .env file")
-	}
-
-	host := os.Getenv("PG_HOST")
-	port := os.Getenv("PG_PORT")
-	user := os.Getenv("PG_USER")
-	password := os.Getenv("PG_PASSWORD")
-	dbname := os.Getenv("PG_DBNAME")
-
-	// Postgres connection string
-	psqlConnString := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable",
-		host,
-		port,
-		user,
-		password,
-		dbname,
-	)
-
-	openDB := func() error {
-		db, err = sql.Open("postgres", psqlConnString)
-		return err
-	}
-
-	err = backoff.Retry(openDB, backoff.NewExponentialBackOff())
-	if err != nil {
-		return nil, err
-	}
-
-	fmt.Println("Successfully connected to postgres")
-
-	return db, nil
-}
-
 func Insert(product models.Product) int64 {
-	db, err := createConnection()
+	db, err := lib.CreateConnection()
 	if err != nil {
 		log.Fatalf("unable to connect the database. %v\n", err)
 	}
@@ -71,7 +28,7 @@ func Insert(product models.Product) int64 {
 	return id
 }
 func GetOne(id int64) (models.Product, error) {
-	db, err := createConnection()
+	db, err := lib.CreateConnection()
 	if err != nil {
 		log.Fatalf("unable to connect the database. %v\n", err)
 	}
@@ -98,7 +55,7 @@ func GetOne(id int64) (models.Product, error) {
 	return product, err
 }
 func GetAll() ([]models.Product, error) {
-	db, err := createConnection()
+	db, err := lib.CreateConnection()
 	if err != nil {
 		log.Fatalf("unable to connect the database. %v\n", err)
 	}
@@ -128,7 +85,7 @@ func GetAll() ([]models.Product, error) {
 }
 
 func UpdateProduct(id int64, product models.Product) int64 {
-	db, err := createConnection()
+	db, err := lib.CreateConnection()
 	if err != nil {
 		log.Fatalf("unable to connect the database. %v\n", err)
 	}
@@ -153,7 +110,7 @@ func UpdateProduct(id int64, product models.Product) int64 {
 }
 
 func DeleteProduct(id int64) int64 {
-	db, err := createConnection()
+	db, err := lib.CreateConnection()
 	if err != nil {
 		log.Fatalf("unable to connect the database. %v\n", err)
 	}
