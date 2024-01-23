@@ -9,10 +9,10 @@ import (
 func Router() *mux.Router {
 	router := mux.NewRouter()
 
-	router.HandleFunc("/api/products/{id}", handlers.GetProduct).Methods("GET", "OPTIONS")
-	router.HandleFunc("/api/products", handlers.GetAllProducts).Methods("GET", "OPTIONS")
-	router.HandleFunc("/api/products", handlers.CreateProduct).Methods("POST", "OPTIONS")
-	router.HandleFunc("/api/products/{id}", handlers.UpdateProduct).Methods("PUT", "OPTIONS")
-	router.HandleFunc("/api/products/{id}", handlers.DeleteProduct).Methods("DELETE", "OPTIONS")
+	router.HandleFunc("/api/products/{id:[0-9]+}", handlers.GetProduct).Methods("GET")
+	router.HandleFunc("/api/products", handlers.GetAllProducts).Methods("GET")
+	router.HandleFunc("/api/products", handlers.CreateProduct).Methods("POST")
+	router.HandleFunc("/api/products/{id:[0-9]+}", handlers.UpdateProduct).Methods("PUT")
+	router.HandleFunc("/api/products/{id:[0-9]+}", handlers.DeleteProduct).Methods("DELETE")
 	return router
 }
