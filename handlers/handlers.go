@@ -35,7 +35,7 @@ func CreateProduct(w http.ResponseWriter, r *http.Request) {
 		ID:      insertID,
 		Message: "product created succesfully",
 	}
-
+	w.WriteHeader(http.StatusCreated)
 	json.NewEncoder(w).Encode(res)
 }
 
@@ -80,7 +80,7 @@ func UpdateProduct(w http.ResponseWriter, r *http.Request) {
 
 	updatedRows := repository.UpdateProduct(int64(id), product)
 
-	msg := fmt.Sprintf("Product updated successfully. Total rows/records affected %v\n", updatedRows)
+	msg := fmt.Sprintf("Product updated successfully. Total rows/records affected %v", updatedRows)
 
 	res := response{
 		ID:      int64(id),
@@ -99,7 +99,7 @@ func DeleteProduct(w http.ResponseWriter, r *http.Request) {
 
 	deletedRows := repository.DeleteProduct(int64(id))
 
-	msg := fmt.Sprintf("Product deleted suscessfully. Total rows/records %v\n", deletedRows)
+	msg := fmt.Sprintf("Product deleted suscessfully. Total rows/records %v", deletedRows)
 
 	res := response{
 		ID:      int64(id),
