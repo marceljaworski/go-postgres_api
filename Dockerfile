@@ -10,10 +10,11 @@ COPY go.mod go.sum ./
 RUN go mod download
 
 # Copy the source code.
-COPY *.go ./
+COPY . .
+COPY .env .
 
 # Build
-RUN go build -o /go-postgres_api
+RUN go build -v -o /go-postgres_api
 
 # Optional:
 # To bind to a TCP port, runtime parameters must be supplied to the docker command.

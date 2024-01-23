@@ -6,6 +6,10 @@
 - Docker compose
 - CRUD API
 
+## Build App image
+
+`docker build -t marceljaworski/go-postgres_api:1.0 .`
+
 ## Build Postgres container
 
 `p` project name
@@ -15,6 +19,10 @@
 
 exec container
 `docker exec -it containerName bash`
+
+Run the psql command to connect to  the PostgreSQL database
+
+`psql -U username -d database_name` or..
 
 Change to postgres user
 `su - postgres`
@@ -28,13 +36,13 @@ list databases
 Sign into the database
 `psql productsdb`
 
-Ensure you are conected ro database
-`\c products`
+Ensure you are conected to a database
+`\c productsdb`
 
 List of the available tables
 `\d`
 
-Show table products
+Show table products'
 `\d products`
 
 Use CASCADE with DROP TABLE (and DROP SCHEMA)
