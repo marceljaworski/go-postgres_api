@@ -101,7 +101,7 @@ func UpdateProduct(id int64, product models.Product) int64 {
 
 	rowsAffected, err := res.RowsAffected()
 	if err != nil {
-		log.Fatalf("error whilw checking the affected rows. %v\n", err)
+		log.Fatalf("error while checking the affected rows. %v\n", err)
 	}
 
 	fmt.Printf("Total rows/records affected %v\n", rowsAffected)
