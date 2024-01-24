@@ -15,7 +15,7 @@ func Insert(product models.Product) int64 {
 		log.Fatalf("unable to connect the database. %v\n", err)
 	}
 	defer db.Close()
-	sqlStatement := `INSERT INTO products(name, price, company) VALUES ($1, $2, $3) RETURNING productid`
+	sqlStatement := `INSERT INTO products(name, price, company) VALUES ($1, $2, $3) RETURNING product_id`
 	var id int64
 
 	err = db.QueryRow(sqlStatement, product.Name, product.Price, product.Company).Scan(&id)
@@ -36,7 +36,7 @@ func GetOne(id int64) (models.Product, error) {
 
 	var product models.Product
 
-	sqlStatement := `SELECT * FROM products WHERE productid=$1`
+	sqlStatement := `SELECT * FROM products WHERE product_id=$1`
 
 	row := db.QueryRow(sqlStatement, id)
 
@@ -91,7 +91,7 @@ func UpdateProduct(id int64, product models.Product) int64 {
 	}
 	defer db.Close()
 
-	sqlStatement := `UPDATE products SET name=$2, price=$3, company=$4 WHERE productid=$1`
+	sqlStatement := `UPDATE products SET name=$2, price=$3, company=$4 WHERE product_id=$1`
 
 	res, err := db.Exec(sqlStatement, id, product.Name, product.Price, product.Company)
 
@@ -116,7 +116,7 @@ func DeleteProduct(id int64) int64 {
 	}
 	defer db.Close()
 
-	sqlStatement := `DELETE FROM products WHERE productid=$1`
+	sqlStatement := `DELETE FROM products WHERE product_id=$1`
 	res, err := db.Exec(sqlStatement, id)
 	if err != nil {
 		log.Fatalf("unable to execute the query %v\n", err)

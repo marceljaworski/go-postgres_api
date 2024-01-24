@@ -45,5 +45,15 @@ func CreateConnection() (*sql.DB, error) {
 		return nil, err
 	}
 
+	if _, err := db.Exec(
+		`CREATE TABLE IF NOT EXISTS products (
+			product_id SERIAL PRIMARY KEY,
+			name VARCHAR NOT NULL,
+			price INTEGER,
+			company VARCHAR NOT NULL
+		);`); err != nil {
+		return nil, err
+	}
+
 	return db, nil
 }
