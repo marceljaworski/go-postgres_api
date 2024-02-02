@@ -23,7 +23,6 @@ type response struct {
 
 func CreateProduct(w http.ResponseWriter, r *http.Request) {
 	var product models.Product
-
 	err := json.NewDecoder(r.Body).Decode(&product)
 	if err != nil {
 		log.Fatalf("Unabel to decode the request body. %v\n", err)

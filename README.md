@@ -14,6 +14,15 @@
 
 `p` project name
 `docker compose -p postgres up -d`
+or..
+up
+`docker-compose -p postgres -f docker-compose.yaml up -d`
+down
+`docker-compose -p postgres -f docker-compose.yaml down`
+stop
+`docker-compose -p postgres -f docker-compose.yaml stop`
+start
+`docker-compose -p postgres -f docker-compose.yaml start`
 
 ## Postgres usefull commands
 
